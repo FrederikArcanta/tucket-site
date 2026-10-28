@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tucket — Elke kaart in zijn vak</title>
+<meta name="description" content="Tucket bewaart je klantenkaarten, identiteitskaart en rijbewijs lokaal op je iPhone. Geen account, geen server.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="tucket-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pine: #0D6C63;
+    --pine-deep: #0A3F3B;
+    --teal: #0D6C63;
+    --teal-soft: #DCEBE8;
+    --mint: #A8DCD2;
+    --cream: #EEF4F2;
+    --sand: #F7FAF9;
+    --ink: #0E2B28;
+    --text: #263B39;
+    --muted: #5B706D;
+    --border: #D6E2DF;
+    --white: #FFFFFF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--sand);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(247,250,249,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 52px;
+    height: 60px;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo img { width: 30px; height: 30px; border-radius: 8px; }
+  .nav-right { display: flex; align-items: center; gap: 24px; }
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-link:hover { color: var(--ink); }
+  .lang-switch { display: flex; gap: 4px; }
+  .lang-switch button {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .lang-switch button.active { border-color: var(--border); background: var(--white); color: var(--ink); }
+  .lang-switch button:hover:not(.active) { color: var(--ink); }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, #1A8277 0%, var(--pine) 45%, var(--pine-deep) 100%);
+    color: var(--cream);
+    padding: 96px 52px 104px;
+    text-align: center;
+  }
+  .hero img {
+    width: 128px;
+    height: 128px;
+    border-radius: 30px;
+    box-shadow: 0 0 0 1.5px rgba(255,255,255,0.28), 0 20px 50px rgba(0,0,0,0.35);
+    margin-bottom: 32px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    background: rgba(244,236,225,0.08);
+    border: 1px solid rgba(244,236,225,0.18);
+    color: var(--cream);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+    margin-bottom: 20px;
+  }
+  h1 .accent { color: var(--mint); }
+  .hero-sub {
+    font-size: 1.08rem;
+    color: rgba(244,236,225,0.72);
+    max-width: 560px;
+    margin: 0 auto 34px;
+    line-height: 1.7;
+  }
+  .store-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--cream);
+    color: var(--pine);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+  }
+  .store-badge svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ── SECTIONS ── */
+  section { padding: 88px 52px; }
+  .container { max-width: 1040px; margin: 0 auto; }
+  .section-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  h2 {
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  h2 .accent { color: var(--teal); }
+  .section-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .grid-3, .grid-4 {
+    display: grid;
+    gap: 16px;
+    margin-top: 48px;
+  }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: border-color 0.18s, transform 0.18s;
+  }
+  .card:hover { border-color: var(--teal); transform: translateY(-3px); }
+  .card-icon {
+    width: 42px; height: 42px;
+    background: var(--teal-soft);
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .card p { font-size: 0.87rem; color: var(--muted); line-height: 1.65; }
+
+  .what { background: var(--sand); }
+  .features { background: var(--cream); }
+  .privacy { background: var(--sand); }
+
+  /* ── NOTICE ── */
+  .notice { background: var(--cream); }
+  .notice-box {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 14px;
+    padding: 28px 30px;
+    max-width: 760px;
+  }
+  .notice-box h3 { font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .notice-box p { font-size: 0.92rem; color: var(--text); }
+  .notice-box p + p { margin-top: 10px; }
+  .notice-box a, .support a { color: var(--teal); font-weight: 600; }
+
+  /* ── SUPPORT ── */
+  .support { background: var(--sand); text-align: center; }
+  .support .section-sub { margin: 0 auto 28px; }
+  .mail-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--pine);
+    color: var(--cream) !important;
+    text-decoration: none;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: background 0.18s;
+  }
+  .mail-btn:hover { background: var(--teal); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--pine-deep);
+    color: rgba(244,236,225,0.6);
+    padding: 48px 52px 36px;
+  }
+  .footer-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-logo {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--cream);
+    display: flex; align-items: center; gap: 9px;
+  }
+  .footer-logo img { width: 26px; height: 26px; border-radius: 7px; }
+  .footer-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .fbadge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 0.74rem;
+    font-weight: 500;
+  }
+  .footer-copy {
+    width: 100%;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    font-size: 0.75rem;
+    color: rgba(244,236,225,0.35);
+  }
+  .footer-copy a { color: rgba(244,236,225,0.55); }
+
+  /* Scroll animations */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .fade-up.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 16px; }
+    .nav-link { display: none; }
+    .hero { padding: 64px 16px 72px; }
+    section { padding: 64px 16px; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    footer { padding: 40px 16px 28px; }
+  }
+  @media (max-width: 520px) {
+    .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">
+    <img src="tucket-icon.png" alt="">
+    Tucket
+  </a>
+  <div class="nav-right">
+    <a href="#what" class="nav-link" data-i18n="nav_what">Wat zit erin</a>
+    <a href="#privacy" class="nav-link" data-i18n="nav_privacy">Privacy</a>
+    <a href="#support" class="nav-link" data-i18n="nav_support">Support</a>
+    <div class="lang-switch">
+      <button onclick="setLang('nl')" class="active">NL</button>
+      <button onclick="setLang('fr')">FR</button>
+      <button onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <img src="tucket-icon.png" alt="Tucket">
+  <div><span class="hero-eyebrow" data-i18n="hero_eyebrow">iPhone · iOS 18</span></div>
+  <h1 data-i18n="hero_title">Elke kaart <span class="accent">in zijn vak.</span></h1>
+  <p class="hero-sub" data-i18n="hero_sub">Tucket bewaart je klantenkaarten, je identiteitskaart en je rijbewijs op je iPhone. Alles blijft op je toestel: geen account, geen server.</p>
+  <span class="store-badge">
+    <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+    <span data-i18n="hero_badge">Binnenkort in de App Store</span>
+  </span>
+</section>
+
+<!-- WHAT -->
+<section class="what" id="what">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" data-i18n="what_label">Wat zit erin</div>
+      <h2 data-i18n="what_title">Drie soorten kaarten, <span class="accent">één vak</span></h2>
+      <p class="section-sub" data-i18n="what_sub">Geen stapel plastic meer in je portefeuille. Je kaarten staan per soort gesorteerd, doorzoekbaar en vast te zetten bovenaan.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card fade-up">
+        <div class="card-icon">🛒</div>
+        <h3 data-i18n="loyalty_title">Klantenkaarten</h3>
+        <p data-i18n="loyalty_desc">Scan de barcode met de camera, kies een foto of typ het nummer in. Aan de kassa toon je de barcode op volledig scherm, met hogere helderheid.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.1s">
+        <div class="card-icon">🪪</div>
+        <h3 data-i18n="id_title">Identiteitskaart</h3>
+        <p data-i18n="id_desc">Neem een foto van de voor- en achterkant. Tucket leest de machineleesbare zone (MRZ) en vult de velden in. Je kan alles nakijken en aanpassen.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.2s">
+        <div class="card-icon">🚗</div>
+        <h3 data-i18n="licence_title">Rijbewijs</h3>
+        <p data-i18n="licence_desc">Neem een foto. Tucket probeert naam, nummer, categorieën en geldigheid te lezen. Wat niet gelezen wordt, vul je zelf aan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" data-i18n="feat_label">Functies</div>
+      <h2 data-i18n="feat_title">Klein, <span class="accent">maar slim</span></h2>
+    </div>
+    <div class="grid-4">
+      <div class="card fade-up">
+        <div class="card-icon">🔐</div>
+        <h3 data-i18n="lock_title">Vergrendeling</h3>
+        <p data-i18n="lock_desc">Bescherm je documenten met een pincode of Face ID.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.07s">
+        <div class="card-icon">📍</div>
+        <h3 data-i18n="near_title">Dichtbij eerst</h3>
+        <p data-i18n="near_desc">Koppel een winkeladres aan een kaart. De kaart van de dichtstbijzijnde winkel staat dan bovenaan.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.14s">
+        <div class="card-icon">🔎</div>
+        <h3 data-i18n="search_title">Zoeken en vastzetten</h3>
+        <p data-i18n="search_desc">Vind elke kaart snel terug en zet je favorieten vast bovenaan.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.21s">
+        <div class="card-icon">🌙</div>
+        <h3 data-i18n="lang_title">Licht en donker</h3>
+        <p data-i18n="lang_desc">Volgt je systeeminstelling, of kies zelf. De app is nu in het Nederlands; een meertalige versie volgt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="privacy" id="privacy">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" data-i18n="priv_label">Privacy</div>
+      <h2 data-i18n="priv_title">Je gegevens, op <span class="accent">je toestel</span></h2>
+      <p class="section-sub" data-i18n="priv_sub">Tucket verzamelt geen persoonsgegevens en deelt niets met ons of met derden.</p>
+    </div>
+    <div class="grid-4">
+      <div class="card fade-up">
+        <div class="card-icon">📱</div>
+        <h3 data-i18n="p_local_title">Lokale opslag</h3>
+        <p data-i18n="p_local_desc">Kaarten, foto's en velden staan enkel op je iPhone, versleuteld door iOS. Geen account, geen server, geen iCloud-synchronisatie.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.07s">
+        <div class="card-icon">🚫</div>
+        <h3 data-i18n="p_track_title">Geen tracking</h3>
+        <p data-i18n="p_track_desc">Geen analytics, geen advertenties, geen diensten van derden.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.14s">
+        <div class="card-icon">📷</div>
+        <h3 data-i18n="p_perm_title">Toegang op jouw vraag</h3>
+        <p data-i18n="p_perm_desc">Camera en fotobibliotheek enkel om een kaart of document toe te voegen. Locatie enkel om kaarten op afstand te sorteren; ze blijft op je toestel.</p>
+      </div>
+      <div class="card fade-up" style="transition-delay:.21s">
+        <div class="card-icon">🗺️</div>
+        <h3 data-i18n="p_maps_title">Adres zoeken</h3>
+        <p data-i18n="p_maps_desc">Zoek je een winkeladres, dan gaat die zoekopdracht naar Apple Maps. Het gekozen adres blijft daarna op je toestel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOTICE -->
+<section class="notice" id="notice">
+  <div class="container">
+    <div class="notice-box fade-up">
+      <h3 data-i18n="notice_title">Geen officieel document</h3>
+      <p data-i18n="notice_p1">Een kopie in Tucket vervangt je identiteitskaart of rijbewijs niet. Bij een controle toon je de fysieke kaart.</p>
+      <p data-i18n="notice_p2">Officiële digitale documenten vind je via <a href="https://www.mygov.be" target="_blank" rel="noopener">MyGov.be</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section class="support" id="support">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" data-i18n="sup_label">Support</div>
+      <h2 data-i18n="sup_title">Een vraag of <span class="accent">een probleem?</span></h2>
+      <p class="section-sub" data-i18n="sup_sub">Stuur ons een mail. We antwoorden zo snel mogelijk.</p>
+      <a href="mailto:info@arcanta.be?subject=Tucket" class="mail-btn">✉️ info@arcanta.be</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="tucket-icon.png" alt="">
+      Tucket
+    </div>
+    <div class="footer-badges">
+      <span class="fbadge" data-i18n="fb_device">📱 iPhone</span>
+      <span class="fbadge" data-i18n="fb_private">🔒 100% lokaal</span>
+      <span class="fbadge" data-i18n="fb_account">👤 Geen account</span>
+    </div>
+    <div class="footer-copy" data-i18n="footer_copy">&copy; 2026 Tucket — een project van <a href="https://triple-solutions.com">Triple Solutions</a>. Alle rechten voorbehouden.</div>
+  </div>
+</footer>
+
+<script>
+  const translations = {
+    nl: {
+      nav_what: 'Wat zit erin', nav_privacy: 'Privacy', nav_support: 'Support',
+      hero_eyebrow: 'iPhone · iOS 18',
+      hero_title: 'Elke kaart <span class="accent">in zijn vak.</span>',
+      hero_sub: 'Tucket bewaart je klantenkaarten, je identiteitskaart en je rijbewijs op je iPhone. Alles blijft op je toestel: geen account, geen server.',
+      hero_badge: 'Binnenkort in de App Store',
+      what_label: 'Wat zit erin',
+      what_title: 'Drie soorten kaarten, <span class="accent">één vak</span>',
+      what_sub: 'Geen stapel plastic meer in je portefeuille. Je kaarten staan per soort gesorteerd, doorzoekbaar en vast te zetten bovenaan.',
+      loyalty_title: 'Klantenkaarten',
+      loyalty_desc: 'Scan de barcode met de camera, kies een foto of typ het nummer in. Aan de kassa toon je de barcode op volledig scherm, met hogere helderheid.',
+      id_title: 'Identiteitskaart',
+      id_desc: 'Neem een foto van de voor- en achterkant. Tucket leest de machineleesbare zone (MRZ) en vult de velden in. Je kan alles nakijken en aanpassen.',
+      licence_title: 'Rijbewijs',
+      licence_desc: 'Neem een foto. Tucket probeert naam, nummer, categorieën en geldigheid te lezen. Wat niet gelezen wordt, vul je zelf aan.',
+      feat_label: 'Functies',
+      feat_title: 'Klein, <span class="accent">maar slim</span>',
+      lock_title: 'Vergrendeling', lock_desc: 'Bescherm je documenten met een pincode of Face ID.',
+      near_title: 'Dichtbij eerst', near_desc: 'Koppel een winkeladres aan een kaart. De kaart van de dichtstbijzijnde winkel staat dan bovenaan.',
+      search_title: 'Zoeken en vastzetten', search_desc: 'Vind elke kaart snel terug en zet je favorieten vast bovenaan.',
+      lang_title: 'Licht en donker', lang_desc: 'Volgt je systeeminstelling, of kies zelf. De app is nu in het Nederlands; een meertalige versie volgt.',
+      priv_label: 'Privacy',
+      priv_title: 'Je gegevens, op <span class="accent">je toestel</span>',
+      priv_sub: 'Tucket verzamelt geen persoonsgegevens en deelt niets met ons of met derden.',
+      p_local_title: 'Lokale opslag', p_local_desc: 'Kaarten, foto\'s en velden staan enkel op je iPhone, versleuteld door iOS. Geen account, geen server, geen iCloud-synchronisatie.',
+      p_track_title: 'Geen tracking', p_track_desc: 'Geen analytics, geen advertenties, geen diensten van derden.',
+      p_perm_title: 'Toegang op jouw vraag', p_perm_desc: 'Camera en fotobibliotheek enkel om een kaart of document toe te voegen. Locatie enkel om kaarten op afstand te sorteren; ze blijft op je toestel.',
+      p_maps_title: 'Adres zoeken', p_maps_desc: 'Zoek je een winkeladres, dan gaat die zoekopdracht naar Apple Maps. Het gekozen adres blijft daarna op je toestel.',
+      notice_title: 'Geen officieel document',
+      notice_p1: 'Een kopie in Tucket vervangt je identiteitskaart of rijbewijs niet. Bij een controle toon je de fysieke kaart.',
+      notice_p2: 'Officiële digitale documenten vind je via <a href="https://www.mygov.be" target="_blank" rel="noopener">MyGov.be</a>.',
+      sup_label: 'Support',
+      sup_title: 'Een vraag of <span class="accent">een probleem?</span>',
+      sup_sub: 'Stuur ons een mail. We antwoorden zo snel mogelijk.',
+      fb_device: '📱 iPhone', fb_private: '🔒 100% lokaal', fb_account: '👤 Geen account',
+      footer_copy: '&copy; 2026 Tucket — een project van <a href="https://triple-solutions.com">Triple Solutions</a>. Alle rechten voorbehouden.'
+    },
+    fr: {
+      nav_what: 'Contenu', nav_privacy: 'Confidentialité', nav_support: 'Support',
+      hero_eyebrow: 'iPhone · iOS 18',
+      hero_title: 'Chaque carte <span class="accent">à sa place.</span>',
+      hero_sub: 'Tucket conserve vos cartes de fidélité, votre carte d\'identité et votre permis de conduire sur votre iPhone. Tout reste sur votre appareil : pas de compte, pas de serveur.',
+      hero_badge: 'Bientôt sur l\'App Store',
+      what_label: 'Contenu',
+      what_title: 'Trois types de cartes, <span class="accent">une seule place</span>',
+      what_sub: 'Fini la pile de plastique dans votre portefeuille. Vos cartes sont classées par type, faciles à retrouver et à épingler en haut.',
+      loyalty_title: 'Cartes de fidélité',
+      loyalty_desc: 'Scannez le code-barres avec l\'appareil photo, choisissez une photo ou saisissez le numéro. À la caisse, le code-barres s\'affiche en plein écran, avec une luminosité accrue.',
+      id_title: 'Carte d\'identité',
+      id_desc: 'Photographiez le recto et le verso. Tucket lit la zone de lecture automatique (MRZ) et remplit les champs. Vous pouvez tout vérifier et corriger.',
+      licence_title: 'Permis de conduire',
+      licence_desc: 'Prenez une photo. Tucket essaie de lire le nom, le numéro, les catégories et la validité. Ce qui n\'est pas lu, vous le complétez vous-même.',
+      feat_label: 'Fonctions',
+      feat_title: 'Petite, <span class="accent">mais futée</span>',
+      lock_title: 'Verrouillage', lock_desc: 'Protégez vos documents avec un code PIN ou Face ID.',
+      near_title: 'Le plus proche d\'abord', near_desc: 'Associez l\'adresse d\'un magasin à une carte. La carte du magasin le plus proche apparaît alors en haut.',
+      search_title: 'Rechercher et épingler', search_desc: 'Retrouvez chaque carte rapidement et épinglez vos favorites en haut.',
+      lang_title: 'Clair et sombre', lang_desc: 'Suit le réglage du système, ou choisissez vous-même. L\'app est actuellement en néerlandais ; une version multilingue suivra.',
+      priv_label: 'Confidentialité',
+      priv_title: 'Vos données, sur <span class="accent">votre appareil</span>',
+      priv_sub: 'Tucket ne collecte aucune donnée personnelle et ne partage rien, ni avec nous ni avec des tiers.',
+      p_local_title: 'Stockage local', p_local_desc: 'Cartes, photos et champs restent uniquement sur votre iPhone, chiffrés par iOS. Pas de compte, pas de serveur, pas de synchronisation iCloud.',
+      p_track_title: 'Aucun suivi', p_track_desc: 'Pas d\'analytics, pas de publicité, aucun service tiers.',
+      p_perm_title: 'Accès à votre demande', p_perm_desc: 'Appareil photo et photothèque uniquement pour ajouter une carte ou un document. La localisation sert uniquement à trier les cartes par distance ; elle reste sur votre appareil.',
+      p_maps_title: 'Recherche d\'adresse', p_maps_desc: 'Si vous cherchez l\'adresse d\'un magasin, cette recherche est envoyée à Apple Plans. L\'adresse choisie reste ensuite sur votre appareil.',
+      notice_title: 'Pas un document officiel',
+      notice_p1: 'Une copie dans Tucket ne remplace pas votre carte d\'identité ni votre permis de conduire. Lors d\'un contrôle, présentez la carte physique.',
+      notice_p2: 'Les documents numériques officiels sont disponibles via <a href="https://www.mygov.be" target="_blank" rel="noopener">MyGov.be</a>.',
+      sup_label: 'Support',
+      sup_title: 'Une question ou <span class="accent">un problème ?</span>',
+      sup_sub: 'Envoyez-nous un e-mail. Nous répondons dès que possible.',
+      fb_device: '📱 iPhone', fb_private: '🔒 100 % local', fb_account: '👤 Sans compte',
+      footer_copy: '&copy; 2026 Tucket — un projet de <a href="https://triple-solutions.com">Triple Solutions</a>. Tous droits réservés.'
+    },
+    en: {
+      nav_what: 'What\'s inside', nav_privacy: 'Privacy', nav_support: 'Support',
+      hero_eyebrow: 'iPhone · iOS 18',
+      hero_title: 'Every card <span class="accent">in its place.</span>',
+      hero_sub: 'Tucket keeps your loyalty cards, ID card and driving licence on your iPhone. Everything stays on your device: no account, no server.',
+      hero_badge: 'Coming soon to the App Store',
+      what_label: 'What\'s inside',
+      what_title: 'Three kinds of cards, <span class="accent">one pocket</span>',
+      what_sub: 'No more stack of plastic in your wallet. Your cards are sorted by type, searchable, and can be pinned to the top.',
+      loyalty_title: 'Loyalty cards',
+      loyalty_desc: 'Scan the barcode with the camera, pick a photo or type the number. At the till, the barcode is shown full screen at higher brightness.',
+      id_title: 'ID card',
+      id_desc: 'Take a photo of the front and back. Tucket reads the machine-readable zone (MRZ) and fills in the fields. You can check and edit everything.',
+      licence_title: 'Driving licence',
+      licence_desc: 'Take a photo. Tucket tries to read the name, number, categories and validity. Anything it can\'t read, you fill in yourself.',
+      feat_label: 'Features',
+      feat_title: 'Small, <span class="accent">but smart</span>',
+      lock_title: 'Lock', lock_desc: 'Protect your documents with a PIN or Face ID.',
+      near_title: 'Nearest first', near_desc: 'Link a store address to a card. The card for the nearest store then appears at the top.',
+      search_title: 'Search and pin', search_desc: 'Find any card quickly and pin your favourites to the top.',
+      lang_title: 'Light and dark', lang_desc: 'Follows your system setting, or choose yourself. The app is currently in Dutch; a multilingual version will follow.',
+      priv_label: 'Privacy',
+      priv_title: 'Your data, on <span class="accent">your device</span>',
+      priv_sub: 'Tucket collects no personal data and shares nothing with us or with third parties.',
+      p_local_title: 'Local storage', p_local_desc: 'Cards, photos and fields are stored only on your iPhone, encrypted by iOS. No account, no server, no iCloud sync.',
+      p_track_title: 'No tracking', p_track_desc: 'No analytics, no ads, no third-party services.',
+      p_perm_title: 'Access on your terms', p_perm_desc: 'Camera and photo library only to add a card or document. Location only to sort cards by distance; it stays on your device.',
+      p_maps_title: 'Address search', p_maps_desc: 'When you search for a store address, that query goes to Apple Maps. The chosen address then stays on your device.',
+      notice_title: 'Not an official document',
+      notice_p1: 'A copy in Tucket does not replace your ID card or driving licence. When checked, show the physical card.',
+      notice_p2: 'Official digital documents are available via <a href="https://www.mygov.be" target="_blank" rel="noopener">MyGov.be</a>.',
+      sup_label: 'Support',
+      sup_title: 'A question or <span class="accent">a problem?</span>',
+      sup_sub: 'Send us an e-mail. We\'ll reply as soon as we can.',
+      fb_device: '📱 iPhone', fb_private: '🔒 100% local', fb_account: '👤 No account',
+      footer_copy: '&copy; 2026 Tucket — a project by <a href="https://triple-solutions.com">Triple Solutions</a>. All rights reserved.'
+    }
+  };
+
+  function setLang(lang) {
+    document.querySelectorAll('.lang-switch button').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+    });
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) {
+        if (t[key].includes('<') || t[key].includes('&')) el.innerHTML = t[key];
+        else el.textContent = t[key];
+      }
+    });
+    document.documentElement.lang = lang;
+  }
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
